@@ -3,6 +3,8 @@ Pro monitoring jsem se rozhodl použít Prometheus a Grafanu.
 Shromažduji metriky ze všech zařízení které to umožnují.
 ![Alt text](https://github.com/jakubsindelar/monitoring/blob/main/img/title.jpeg?raw=true "title image")
 
+Ve složce *img* si můžete prohlédnout screenshoty z Grafany..
+
 ## Co monitoruji?
 - Turris router 
 - Mikrotiky
@@ -11,17 +13,21 @@ Shromažduji metriky ze všech zařízení které to umožnují.
 - Docker
 
 ## Co k tomu používám?
-- Prometheus - storage pro metriky
-- Grafana - grafické zobrazení metrik
-- cAdvisor - sbírá metriky z dockeru
-- Node Exporter - sbírá metriky z serverů atd.
+- [Prometheus](https://prometheus.io) - storage pro metriky
+- [Grafana](https://grafana.com) - grafické zobrazení metrik
+- [cAdvisor](https://github.com/google/cadvisor) - sbírá metriky z dockeru
+- [Node Exporter](https://github.com/prometheus/node_exporter) - sbírá metriky z serverů atd.
+- [MKTXP](https://github.com/akpw/mktxp/tree/main) - sbírá metriky  z Mirotiků
+- [OpenWrt exporter](https://grafana.com/blog/2021/02/09/how-i-monitor-my-openwrt-router-with-grafana-cloud-and-prometheus/) - sbírá metriky z OpenWrt
+- [snmp_exporter](https://github.com/prometheus/snmp_exporter) - sbírá metrky ze Synology
 
-# Použité GitHub projekty:
-- [snmp_exporter](https://github.com/prometheus/snmp_exporter) - export metrik z Synology
-- [mktxp](https://github.com/akpw/mktxp/tree/main) - export metrik z Mikrotiků
+# Konfigurace mého monitoring řešení:
+Grafanu a Promethea mám rozjetou v Dockeru na své VPSce. K tomu tam mám puštěný rovnou cAdvisor a Node Exporter.
 
-# Konfigurace
-## Monitoring docker-compose
+Všechny další kontejnery už mám puštěné ve své domácí síti.
+
+
+**Docker-compose pro Grafanu, Promethea a cAdvisor**
 
 ```yaml
 version: '2'
@@ -66,23 +72,6 @@ services:
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: monitoring-node-exporter
-    restart: unless-stopped
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    expose:
-      - 9100
-    depends_on:
-      - cadvisor
 ```
 
 ## Prometheus config 
@@ -94,6 +83,7 @@ global:
   evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 
+## TODO
 # Alertmanager configuration
 alerting:
   alertmanagers:
@@ -146,6 +136,11 @@ scrape_configs:
   - targets:
     - 192.168.0.5:49090
 ```
+
+# Použité GitHub projekty:
+- [snmp_exporter](https://github.com/prometheus/snmp_exporter) - export metrik z Synology
+- [mktxp](https://github.com/akpw/mktxp/tree/main) - export metrik z Mikrotiků
+- [Node Exporter](https://github.com/prometheus/node_exporter) - export metrik z noudů
 
 # Co plánuji přidat
 - monitoring VPN sítě wireguard
