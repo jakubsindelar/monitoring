@@ -1,6 +1,7 @@
 # Popis řešení
 Pro monitoring jsem se rozhodl použít Prometheus a Grafanu.
 Shromažduji metriky ze všech zařízení které to umožnují.
+![Alt text](https://github.com/jakubsindelar/monitoring/blob/main/img/title.jpeg?raw=true "title image")
 
 ## Co monitoruji?
 - Turris router 
