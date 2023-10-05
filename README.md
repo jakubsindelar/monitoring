@@ -1,5 +1,7 @@
-# Popis řešeníPro monitoring jsem se rozhodl použít Prometheus a Grafanu.
+# Popis řešení
+Pro monitoring jsem se rozhodl použít Prometheus a Grafanu.
 Shromažduji metriky ze všech zařízení které to umožnují.
+
 ## Co monitoruji?
 - Turris router 
 - Mikrotiky
