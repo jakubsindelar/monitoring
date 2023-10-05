@@ -1,0 +1,59 @@
+version: '2'
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+services:
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: monitoring-grafana
+    restart: unless-stopped
+    user: root
+    ports:
+      - "3580:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+  prometheus:
+    image: prom/prometheus
+    container_name: monitoring-prometheus
+    user: root
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=100y'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    depends_on:
+    - cadvisor
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: monitoring-cadvisor
+    ports:
+    - 8080:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: monitoring-node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
+    depends_on:
+      - cadvisor

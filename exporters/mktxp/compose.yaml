@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+  mktxp:
+    image: ghcr.io/akpw/mktxp:latest
+    container_name: mikrotik-exporter
+    volumes:
+      - /volume1/docker/mktxp/mktxp:/home/mktxp/mktxp/
+    restart: on-failure:5
+    ports:
+      - 49090:49090
